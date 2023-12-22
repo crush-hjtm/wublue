@@ -20,4 +20,9 @@ A familiar(ish) desktop for KDE fans, but with all the developer goodness built-
 3. [Developer Experience Edition](https://universal-blue.discourse.group/t/bluefin-dx-the-bluefin-developer-experience/39)
 4. [Administrator's Guide](https://universal-blue.discourse.group/t/bluefin-administrators-guide/40)
 5. [Framework Images](https://universal-blue.org/images/framework/)
+<<<<<<<
 -->
+
+=======
+-->
+>>>>>>>
