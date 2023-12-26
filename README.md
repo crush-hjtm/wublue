@@ -22,7 +22,3 @@ A familiar(ish) desktop for KDE fans, but with all the developer goodness built-
 5. [Framework Images](https://universal-blue.org/images/framework/)
 <<<<<<<
 -->
-
-=======
--->
->>>>>>>
