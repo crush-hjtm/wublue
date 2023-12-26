@@ -35,7 +35,6 @@
 				"usbmuxd",
 				"wireguard-tools",
 				"xprop",
-				"yaru-theme",
 				"wl-clipboard", 
 				"zsh"
 			],
@@ -98,15 +97,9 @@
 		},
 		"exclude": {
 			"bluefin": [
-				"gnome-extensions-app",
-				"gnome-software-rpm-ostree",
-				"gnome-tour",
 				"ublue-os-update-services"
 			],
 			"bluefin-dx": [
-				"gnome-extensions-app",
-				"gnome-software-rpm-ostree",
-				"gnome-tour",
 				"ublue-os-update-services"
 			]
 		}
@@ -133,7 +126,6 @@
 		},
 		"exclude": {
 			"bluefin": [
-				"gnome-terminal-nautilus"
 			],
 			"bluefin-dx": [],
 			"bluefin-framework": []
