@@ -1,4 +1,4 @@
-# 󱍢 Welcome to Bluefin (󰂡eta) 
+# 󱍢 Welcome to Aurora (Alpha) 
 󱋩 `%IMAGE_NAME%:%IMAGE_TAG%`
 
 |  Command | Description |
@@ -8,7 +8,3 @@
 | `ujust bluefin-cli` | Configure the terminal (Alpha) |
 
 %TIP%
-
-- 󰊤 [Issues](https://issues.projectbluefin.io)
-- 󰈙 [Documentation](http://docs.projectbluefin.io/)
-- 󰊌 [Discuss](https://community.projectbluefin.io/)
