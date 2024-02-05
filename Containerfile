@@ -17,28 +17,6 @@ ARG BASE_IMAGE_NAME="${BASE_IMAGE_NAME}"
 ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION}"
 ARG PACKAGE_LIST="aurora"
 
-
-RUN if [ ${FEDORA_MAJOR_VERSION} -ge "39" ]; then \
-      wget https://copr.fedorainfracloud.org/coprs/kylegospo/prompt/repo/fedora-$(rpm -E %fedora)/kylegospo-prompt-fedora-$(rpm -E %fedora).repo?arch=x86_64 -O /etc/yum.repos.d/_copr_kylegospo-prompt.repo && \
-        rpm-ostree override replace \
-        --experimental \
-        --from repo=copr:copr.fedorainfracloud.org:kylegospo:prompt \
-            vte291 \
-            vte-profile && \
-        rpm-ostree install \
-            prompt && \
-        rm -f /etc/yum.repos.d/_copr_kylegospo-prompt.repo && \
-        rpm-ostree override remove \
-            power-profiles-daemon \
-            || true && \
-        rpm-ostree override remove \
-            tlp \
-            tlp-rdw \
-            || true \
-    ; fi
-
-
-
 COPY usr /usr
 COPY just /tmp/just
 COPY etc/yum.repos.d/ /etc/yum.repos.d/
