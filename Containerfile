@@ -17,6 +17,28 @@ ARG BASE_IMAGE_NAME="${BASE_IMAGE_NAME}"
 ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION}"
 ARG PACKAGE_LIST="aurora"
 
+
+RUN if [ ${FEDORA_MAJOR_VERSION} -ge "39" ]; then \
+      wget https://copr.fedorainfracloud.org/coprs/kylegospo/prompt/repo/fedora-$(rpm -E %fedora)/kylegospo-prompt-fedora-$(rpm -E %fedora).repo?arch=x86_64 -O /etc/yum.repos.d/_copr_kylegospo-prompt.repo && \
+        rpm-ostree override replace \
+        --experimental \
+        --from repo=copr:copr.fedorainfracloud.org:kylegospo:prompt \
+            vte291 \
+            vte-profile && \
+        rpm-ostree install \
+            prompt && \
+        rm -f /etc/yum.repos.d/_copr_kylegospo-prompt.repo && \
+        rpm-ostree override remove \
+            power-profiles-daemon \
+            || true && \
+        rpm-ostree override remove \
+            tlp \
+            tlp-rdw \
+            || true \
+    ; fi
+
+
+
 COPY usr /usr
 COPY just /tmp/just
 COPY etc/yum.repos.d/ /etc/yum.repos.d/
@@ -39,7 +61,7 @@ RUN sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo
             /tmp/akmods-rpms/kmods/*v4l2loopback*.rpm \
             /tmp/akmods-rpms/kmods/*wl*.rpm \
     ; fi && \
-    if grep -qv "asus" <<< "${AKMODS_FLAVOR}"; then \
+    if grep -qv "asus" < "${AKMODS_FLAVOR}"; then \
         rpm-ostree install \
             /tmp/akmods-rpms/kmods/*evdi*.rpm \
     ; fi && \
@@ -155,7 +177,6 @@ RUN systemctl enable docker.socket && \
 
 RUN /tmp/workarounds.sh
 
-# Clean up repos, everything is on the image so we don't need them
 RUN rm -f /etc/yum.repos.d/ublue-os-staging-fedora-"${FEDORA_MAJOR_VERSION}".repo && \
     rm -f /etc/yum.repos.d/ganto-lxc4-fedora-"${FEDORA_MAJOR_VERSION}".repo && \
     rm -f /etc/yum.repos.d/karmab-kcli-fedora-"${FEDORA_MAJOR_VERSION}".repo && \
