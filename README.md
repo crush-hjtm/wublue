@@ -37,7 +37,3 @@ Each image is available in a Surface, Framework, Asus and Nvidia Version to supp
 At the end I want to give a big shoutout to [The Universal Blue Project](https://github.com/ublue-os) because without these guys, Aurora would have never been possible. Thanks so much. 
 
 Peace out. ✌️
-
-=======
--->
->>>>>>>
