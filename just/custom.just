@@ -5,9 +5,37 @@ benchmark:
     echo 'Running a 1 minute benchmark ...'
     stress-ng --matrix 0 -t 1m --times
 
-# Configure bluefin-cli Terminal Experience
+# Configure Bluefin-CLI Terminal Experience
 bluefin-cli:
-    /usr/libexec/bluefin-cli.sh
+    @/usr/libexec/enable-bluefin-cli.sh
+
+# Install Homebrew | https://brew.sh
+brew:
+    #!/usr/bin/env bash
+    source /usr/lib/ujust/ujust.sh
+    if [[ ! -f "/var/home/linuxbrew/.linuxbrew/bin" || ! -x "/var/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+        echo "${b}Brew Installation${n}"
+        echo "Please ${b}IGNORE${n} everything the installer tells you to do at the end"
+        echo "We have already done it for you! You just need to close and re-open the terminal after installation"
+        echo "Do you understand?"
+        echo "Please type in \"YES I UNDERSTAND\" and press enter"
+        read ACCEPT
+        if [ "$ACCEPT" == "YES I UNDERSTAND" ]; then
+          /usr/bin/bash -c '/usr/libexec/brew-install'
+        else
+          echo "Capitalization matters when you type \"YES I UNDERSTAND\""
+        fi
+    fi
+
+# Install "fleek" set of packages for brew | none, low, default, high
+brew-fleek level="high":
+    #!/usr/bin/env bash
+    curl --proto '=https' --tlsv1.2 -sSf -L https://brew.getfleek.dev/s/fleek | bash -s -- "{{ level }}"
+
+# Configure Terminal Experience
+[private]
+configure-terminal:
+    @/usr/libexec/configure-terminal.sh
 
 # Enable Cockpit for web-based system management | https://cockpit-project.org/
 cockpit:
@@ -89,30 +117,6 @@ jetbrains-toolbox:
     echo "Launching JetBrains Toolbox"
     ./jetbrains-toolbox-"${BUILD_VERSION}"/jetbrains-toolbox
 
-# Install garden.io, the Cloud Native DevOps automation platform | https://garden.io
-garden:
-    #!/usr/bin/env bash
-    if ! command -v garden &> /dev/null; then
-        ASSET_URL=$(curl -s https://api.github.com/repos/garden-io/garden/releases/latest | \
-            jq -r '.assets[] | select(.browser_download_url | test("linux-amd64.tar.gz$")) | .browser_download_url')
-        GARDEN_DIR="${HOME}/.garden/bin"
-        TMP_DIR=$(mktemp -d)
-        curl -sSL "$ASSET_URL" | tar -xz -C "$TMP_DIR"
-        mkdir -p "$GARDEN_DIR"
-        mv "$TMP_DIR"/linux-amd64/garden "$GARDEN_DIR"
-        rm -rf "$TMP_DIR"
-
-        echo ""
-        echo "🌺🌻  Garden has been successfully installed 🌷💐"
-        echo ""
-        echo "Add the Garden CLI to your path by adding the following to your .bashrc/.zshrc:"
-        echo ""
-        echo "  export PATH=\$PATH:\$HOME/.garden/bin"
-        echo ""
-        echo "Head over to our documentation for next steps: https://docs.garden.io"
-        echo ""
-    fi
-
 # Install and configure Incus
 incus:
     #!/usr/bin/env bash
@@ -128,26 +132,22 @@ incus:
         exit
     fi
 
-# Install nix and Devbox
-nix-devbox:
-    echo 'Setting phasers to kill. Installing nix.'
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-    echo 'Installing devbox!'
-    curl -fsSL https://get.jetpack.io/devbox | bash
-    echo 'You MUST reboot to continue'
-
-# Remove nix
-nix-remove:
-    echo 'Setting phasers to stun. Removing nix.'
-    /nix/nix-installer uninstall
-
-# Install nix and Devbox (Global Profile)
-nix-devbox-global:
-    echo 'Installing devbox global profile.'
-    devbox global pull https://devbox.getfleek.dev/high
-    echo 'run "devbox global run install-hook-bash" to configure bash shell'
-    echo 'run "devbox global run install-hook-zsh" to configure zsh shell'
-    echo 'run "devbox global run" to see other available configuration commands'
+# Ptyxis terminal transparency
+ptyxis-transparency opacity="0.95":
+    #!/usr/bin/env bash
+    set -euxo pipefail
+    if [[ -n "$(echo "{{ opacity }}" | grep -v '^[.0-9]*$')" ]]; then
+      printf "Value must be numeric: %s.\n" "{{ opacity }}"
+    elif [[ $(echo "0<{{ opacity }} && 1>{{ opacity }}" | bc -q) -eq 1 ]]; then
+      raw="$(gsettings get org.gnome.Ptyxis profile-uuids)"
+      uuids="$(sed -En 's|[^0-9a-z]*||g; s|([0-9a-z]{32})|\1\n|gp' <<<${raw})"
+      for i in ${uuids}; do
+        location="org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/${i}/"
+        gsettings set "${location}" opacity "{{ opacity }}"; done
+      printf "Ptyxis opacity is now %s.\n" "{{ opacity }}"
+    else
+      printf "Value must be between 0 and 1: %s.\n" "{{ opacity }}"
+    fi
 
 # Run pytorch
 pytorch:
@@ -170,11 +170,6 @@ touch:
     gext install improvedosk@nick-shmyrev.dev
     gext install gestureImprovements@gestures
 
-# Upgrade Distrobox to the latest git version
-distrobox-git:
-    echo 'Installing latest git snapshot of Distrobox'
-    curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sh -s -- --next --prefix ~/.local
-
 # Run the yafti setup tool
 yafti:
     yafti /etc/yafti.yml --force
@@ -191,3 +186,18 @@ dx-group:
     sudo usermod -aG lxd $USER
     sudo usermod -aG libvirt $USER
     @echo "Logout to use docker, incus-admin, lxd, libvirt"
+
+# Add atuin
+atuin:
+    #!/usr/bin/bash 
+    shell=$(basename $SHELL) 
+    if test $shell = "fish"; then 
+        echo "Adding atuin to your config.fish"
+        printf '\nif status is-interactive\n\tif type -q atuin\n\t\tatuin init fish | source\n\tend\nend\n' >> ${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish
+    elif test $shell = "zsh"; then 
+        echo "Adding atuin to your .zshrc"
+        printf '\n[[ "$(command -v atuin)" ]] && eval "$(atuin init zsh)"\n' >> ${ZDOTDIR:-$HOME}/.zshrc 
+    elif test $shell = "bash"; then 
+        echo "Adding bash-prexec and atuin to your .bashrc" 
+        printf '\n[[ -f /usr/share/bash-prexec ]] && source /usr/share/bash-prexec\n[[ "$(command -v atuin)" ]] && eval "$(atuin init bash)"\n' >> ~/.bashrc
+    fi

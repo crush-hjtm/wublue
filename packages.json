@@ -7,6 +7,8 @@
 				"evtest",
 				"fish",
 				"firewall-config",
+				"fastfetch",
+				"gcc",
 				"glow",
 				"gum",
 				"hplip",
@@ -25,6 +27,8 @@
 				"playerctl",
 				"pulseaudio-utils",
 				"python3-pip",
+				"rclone",
+				"restic",
 				"samba-dcerpc",
 				"samba-ldb-ldap-modules",
 				"samba-winbind-clients",
@@ -54,7 +58,7 @@
 				"code",
 				"containerd.io",
 				"dbus-x11",
-                "devpod",
+                                "devpod",
 				"distrobuilder",
 				"docker-ce",
 				"docker-ce-cli",
@@ -122,6 +126,12 @@
 	"39": {
 		"include": {
 			"aurora": [
+				"input-leap",
+				"tuned",
+				"tuned-ppd",
+				"tuned-utils",
+				"tuned-utils-systemtap",
+				"tuned-profiles-atomic"
 			],
 			"aurora-dx": [],
 			"aurora-framework": []
